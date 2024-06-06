@@ -1,16 +1,52 @@
-import { View, Text } from "react-native";
-import React, { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
 import CustomButton from "./CustomButton";
 import NumberSelector from "./NumberSelector";
+import ProviderSelector from "./ProviderSelector";
 import { useGlobalContext } from "../context/GlobalProvider";
-import { createOrderAndAddToUserList } from "../lib/appwrite";
+import { createOrderAndAddToUserList, fetchProvider } from "../lib/appwrite";
 import { ID } from "react-native-appwrite";
 import { useRouter } from "expo-router";
+import { fetchProviders } from "../lib/appwrite"; // Adjust the import path accordingly
 
 const VendingMachineDetails = ({ machine }) => {
   const [selectedNumber, setSelectedNumber] = useState(1);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [providers, setProviders] = useState([]);
+  const [providerStock, setProviderStock] = useState(null);
   const { user } = useGlobalContext();
   const router = useRouter();
+
+  useEffect(() => {
+    const getProviders = async () => {
+      if (machine.availableSponsors && machine.availableSponsors.length > 0) {
+        try {
+          const fetchedProviders = await fetchProviders(
+            machine.availableSponsors
+          );
+          setProviders(fetchedProviders);
+        } catch (error) {
+          console.error("Failed to fetch providers:", error);
+        }
+      }
+    };
+
+    getProviders();
+  }, [machine.availableSponsors]);
+
+  useEffect(() => {
+    const getProvider = async () => {
+      if (selectedProvider) {
+        try {
+          const fetchedProvider = await fetchProvider(selectedProvider);
+          setProviderStock(fetchedProvider.providedStock);
+        } catch (error) {
+          console.error("Failed to fetch providers:", error);
+        }
+      }
+    };
+    getProvider();
+  }, [selectedProvider]);
 
   const handleCreateOrder = async () => {
     const newOrder = {
@@ -20,38 +56,60 @@ const VendingMachineDetails = ({ machine }) => {
       datetime: new Date().toISOString(),
       vendingMachineAddress: machine.address,
       quantity: selectedNumber,
+      providerId: selectedProvider,
     };
 
     try {
-      const createdOrder = await createOrderAndAddToUserList(newOrder, user.$id, machine.vendingMachineId, selectedNumber);
-      console.log('Order created and added to user list:', createdOrder);
-      router.replace("/success")
+      const createdOrder = await createOrderAndAddToUserList(
+        newOrder,
+        user.$id,
+        machine.vendingMachineId,
+        selectedNumber
+      );
+      console.log("Order created and added to user list:", createdOrder);
+      router.replace("/success");
       // Optionally, navigate to an order confirmation screen or display a success message
       // router.push('/order-confirmation'); // Example navigation
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error("Error creating order:", error);
       // Optionally, display an error message to the user
     }
   };
 
   return (
-    <View className="bg-yellow-500 absolute bottom-0 p-4 right-2 left-2 border-t-4 border-l-4 border-r-4 border-blue-900 rounded-tr-2xl rounded-tl-2xl">
-      <Text className="font-pbold text-xl">
+    <View style={styles.detailsContainer}>
+      <Text style={styles.title}>
         Vending Machine - #{machine?.vendingMachineId}
       </Text>
-      <Text className="font-psemibold text-lg">
-        Sticle disponibile: {machine?.stock}
+      <Text style={styles.stock}>
+        Sticle disponibile:{" "}
+        {providerStock && providerStock < machine?.stock
+          ? providerStock
+          : machine?.stock}
       </Text>
-      <View className="h-1 bg-blue-900 my-2"></View>
-      <Text className="font-pregular">
-        <Text className="font-psemibold">Adresa:</Text> {machine?.address}
+      <View style={styles.separator}></View>
+      <Text style={styles.address}>
+        <Text style={styles.addressLabel}>Adresa:</Text> {machine?.address}
       </Text>
+      {machine?.stock > 0 && providers.length > 0 && (
+        <ProviderSelector
+          title="Selecteaza Sponsorul"
+          value={selectedProvider}
+          handleChangeValue={setSelectedProvider}
+          providers={providers}
+          otherStyles="mb-2"
+        />
+      )}
       {machine?.stock > 0 && (
         <NumberSelector
           title="Cate sticle vrei sa achizitionezi ?"
           value={selectedNumber}
           handleChangeValue={setSelectedNumber}
-          stock={machine?.stock}
+          stock={
+            providerStock && providerStock < machine?.stock
+              ? providerStock
+              : machine?.stock
+          }
           otherStyles="mb-2"
         />
       )}
@@ -65,5 +123,41 @@ const VendingMachineDetails = ({ machine }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  detailsContainer: {
+    backgroundColor: "#FDE68A", // yellow-500
+    position: "absolute",
+    bottom: 0,
+    padding: 16,
+    right: 8,
+    left: 8,
+    borderTopWidth: 4,
+    borderLeftWidth: 4,
+    borderRightWidth: 4,
+    borderColor: "#1E3A8A", // blue-900
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+  },
+  title: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 20,
+  },
+  stock: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 18,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: "#1E3A8A", // blue-900
+    marginVertical: 8,
+  },
+  address: {
+    fontFamily: "Poppins-Regular",
+  },
+  addressLabel: {
+    fontFamily: "Poppins-SemiBold",
+  },
+});
 
 export default VendingMachineDetails;

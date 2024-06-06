@@ -85,7 +85,7 @@ const Explore = () => {
     };
 
     fetchLocationAndVendingMachines();
-  }, []);
+  }, [isSidebarOpen]);
 
   const clearSession = async () => {
     await signOut();

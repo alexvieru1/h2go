@@ -8,7 +8,7 @@ import CustomButton from "../../components/CustomButton";
 const success = () => {
     const router = useRouter();
   return (
-    <SafeAreaView className="bg-slate-200 dark:bg-slate-900 flex-1">
+    <SafeAreaView className="bg-slate-200 0 flex-1">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="min-h-[93vh] w-full flex flex-col justify-between px-4 mt-10">
           <View className="flex flex-col justify-center items-center mt-10">
@@ -25,7 +25,7 @@ const success = () => {
           <CustomButton
             title="Inapoi la harta"
             containerStyles="mt-7 bg-blue-400"
-            textStyles="text-slate-200"
+            textStyles="text-white"
             handlePress={()=>router.replace("/explore")}
           />
         </View>

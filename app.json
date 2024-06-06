@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "H2GO",
-    "scheme": "com.jsm.h2go",
     "slug": "h2go",
+    "scheme": "h2go",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,8 +13,7 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "package": "com.jsm.h2go"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {

@@ -4,6 +4,7 @@ import { Link, useRouter } from "expo-router";
 import { Octicons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const SideBar = ({ user, isSidebarOpen, sidebarAnimation, closeSidebar }) => {
   const router = useRouter();
@@ -78,6 +79,74 @@ const SideBar = ({ user, isSidebarOpen, sidebarAnimation, closeSidebar }) => {
           <Feather name="info" size={24} color="white" />
           <Text className="text-white text-lg font-pregular ml-2">Despre</Text>
         </TouchableOpacity>
+        {user.role === "ROLE_ADMIN" && (
+          <View>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/add-provider");
+              }}
+              activeOpacity={0.7}
+              className="flex-row mt-6 items-center"
+            >
+              <MaterialIcons
+                name="admin-panel-settings"
+                size={24}
+                color="white"
+              />
+              <Text className="text-white text-lg font-pregular ml-2">
+                Adauga sponsor
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/update-provider");
+              }}
+              activeOpacity={0.7}
+              className="flex-row mt-6 items-center"
+            >
+              <MaterialIcons
+                name="admin-panel-settings"
+                size={24}
+                color="white"
+              />
+              <Text className="text-white text-lg font-pregular ml-2">
+                Update stoc sponsor
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/delete-provider");
+              }}
+              activeOpacity={0.7}
+              className="flex-row mt-6 items-center"
+            >
+              <MaterialIcons
+                name="admin-panel-settings"
+                size={24}
+                color="white"
+              />
+              <Text className="text-white text-lg font-pregular ml-2">
+                Sterge sponsor
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/update-stock");
+              }}
+              activeOpacity={0.7}
+              className="flex-row mt-6 items-center"
+            >
+              <MaterialIcons
+                name="admin-panel-settings"
+                size={24}
+                color="white"
+              />
+              <Text className="text-white text-lg font-pregular ml-2">
+                Update stoc tonomat
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </Animated.View>
     </>
   );

@@ -1,6 +1,6 @@
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Redirect} from "expo-router";
+import { Redirect } from "expo-router";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import HtoGo from "../../components/HtoGo";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,11 +8,11 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
 const About = () => {
-  const { user} = useGlobalContext();
+  const { user } = useGlobalContext();
   if (user == null) return <Redirect href="/" />;
 
   return (
-    <SafeAreaView className="bg-slate-200 dark:bg-slate-900 flex-1">
+    <SafeAreaView className="bg-slate-200  flex-1">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="min-h-[93vh] w-full flex flex-col justify-between px-4 mt-10">
           <View className="flex flex-col">
@@ -41,7 +41,9 @@ const About = () => {
             <View className="flex mt-16 px-2">
               <View className="flex-row items-center">
                 <MaterialIcons name="star" size={34} color="black" />
-                <Text className="ml-4 text-lg font-pregular">Da-ne un rating</Text>
+                <Text className="ml-4 text-lg font-pregular">
+                  Da-ne un rating
+                </Text>
               </View>
             </View>
             <View className="flex mt-16 px-2">

@@ -36,7 +36,7 @@ const Purchases = () => {
   }
 
   return (
-    <SafeAreaView className="bg-slate-200 dark:bg-slate-900 flex-1">
+    <SafeAreaView className="bg-slate-200 flex-1">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="min-h-[93vh] w-full flex flex-col justify-between px-4 mt-10">
           <View className="flex flex-col">
@@ -46,7 +46,7 @@ const Purchases = () => {
             </View>
             {orders.length > 0 ? (
               orders.map((order, index) => (
-                <View key={order.$id} className="mb-4 p-4 border border-gray-300 rounded-lg bg-white dark:bg-gray-800">
+                <View key={order.$id} className="mb-4 p-4 border border-gray-300 rounded-lg bg-white">
                   <Text className="text-xl font-pbold">Order ID: {order.orderId}</Text>
                   <Text className="text-lg"><Text className="font-psemibold">Data:</Text> {new Date(order.datetime).toLocaleString()}</Text>
                   <Text className="text-lg"><Text className="font-psemibold">Cantitate:</Text> {order.quantity}</Text>

@@ -1,12 +1,9 @@
-import React, { useState, useRef } from "react";
-import { ScrollView, Text, View, Image } from "react-native";
+import React, { useState} from "react";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
-import { Link, Redirect, useRouter } from "expo-router";
-import { signOut } from "../../lib/appwrite";
+import { Redirect, useRouter } from "expo-router";
 import { useGlobalContext } from "../../context/GlobalProvider";
-import { Fontisto } from "@expo/vector-icons";
-import { SimpleLineIcons } from "@expo/vector-icons";
 import HtoGo from "../../components/HtoGo";
 import FormField from "../../components/FormField";
 
@@ -23,12 +20,12 @@ const Purchases = () => {
     message: "",
   });
 
-  const submit = () => {
+  const handleSendEmail = async () => {
 
-  }
+  };
 
   return (
-    <SafeAreaView className="bg-slate-200 dark:bg-slate-900 flex-1">
+    <SafeAreaView className="bg-slate-200 flex-1">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="min-h-[93vh] w-full flex flex-col justify-between px-4 mt-10">
           <View className="flex flex-col">
@@ -67,9 +64,9 @@ const Purchases = () => {
             />
             <CustomButton
               title="Trimite"
-              handlePress={submit}
+              handlePress={handleSendEmail}
               containerStyles="mt-7 bg-blue-400"
-              textStyles="text-slate-200"
+              textStyles="text-white"
               isLoading={isSubmitting}
             />
           </View>

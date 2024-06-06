@@ -54,7 +54,7 @@ const SignIn = () => {
     }
   };
   return (
-    <SafeAreaView className="bg-slate-200 dark:bg-slate-900 h-full">
+    <SafeAreaView className="bg-slate-200 h-full">
       <KeyboardAwareScrollView
         enableAutomaticScroll={true}
         enableOnAndroid={true}
@@ -90,7 +90,7 @@ const SignIn = () => {
               title="Sign In"
               handlePress={submit}
               containerStyles="mt-7 bg-blue-400"
-              textStyles="text-slate-200"
+              textStyles="text-white"
               isLoading={isSubmitting}
             />
             <View className="justify-center pt-5 flex-row gap-2">
