@@ -5,15 +5,19 @@ import NumberSelector from "./NumberSelector";
 import ProviderSelector from "./ProviderSelector";
 import Payment from "./Payment"; // Import the Payment component
 import { useGlobalContext } from "../context/GlobalProvider";
-import { createOrderAndAddToUserList, fetchProvider } from "../lib/appwrite";
+import {
+  createOrderAndAddToUserList,
+  fetchProvider,
+  fetchProviders,
+} from "../lib/appwrite";
 import { ID } from "react-native-appwrite";
 import { useRouter } from "expo-router";
-import { fetchProviders } from "../lib/appwrite"; // Adjust the import path accordingly
 
 const VendingMachineDetails = ({ machine, distance, duration }) => {
   const [selectedNumber, setSelectedNumber] = useState(1);
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [providers, setProviders] = useState([]);
+  const [providerName, setProviderName] = useState("");
   const [providerStock, setProviderStock] = useState(null);
   const [showPayment, setShowPayment] = useState(false);
   const [newOrder, setNewOrder] = useState(null); // Add state for newOrder
@@ -43,13 +47,16 @@ const VendingMachineDetails = ({ machine, distance, duration }) => {
         try {
           const fetchedProvider = await fetchProvider(selectedProvider);
           setProviderStock(fetchedProvider.providedStock);
+          const providerFetched = await fetchProvider(selectedProvider);
+          setProviderName(providerFetched.providerName);
         } catch (error) {
-          console.error("Failed to fetch providers:", error);
+          console.error("Failed to fetch provider stock:", error);
         }
       }
     };
     getProvider();
   }, [selectedProvider]);
+
 
   const handleCreateOrder = async () => {
     const order = {
@@ -77,7 +84,6 @@ const VendingMachineDetails = ({ machine, distance, duration }) => {
       console.log("Order created and added to user list:", newOrder);
       console.log("Selected Provider:", selectedProvider);
       router.replace(`/success/${selectedProvider}`);
-
     } catch (error) {
       console.error("Error creating order:", error);
       Alert.alert("Error", "Unable to create order after successful payment.");
@@ -95,34 +101,51 @@ const VendingMachineDetails = ({ machine, distance, duration }) => {
           ? providerStock
           : machine?.stock}
       </Text>
-      <Text className="font-psemibold text-sm">Distanta: {distance} km</Text>
-      <Text className="font-psemibold text-sm">Timp: ~{duration} min.</Text>
+      <Text style={styles.info}>Distanta: {distance} km</Text>
+      <Text style={styles.info}>Timp: ~{duration} min.</Text>
       <View style={styles.separator}></View>
       <Text style={styles.address}>
         <Text style={styles.addressLabel}>Adresa:</Text> {machine?.address}
       </Text>
-      {machine?.stock > 0 && providers.length > 0 && (
-        <ProviderSelector
-          title="Selecteaza Sponsorul"
-          value={selectedProvider}
-          handleChangeValue={setSelectedProvider}
-          providers={providers}
-          otherStyles="mb-2"
-        />
+
+      {showPayment ? (
+        <View className="space-y-2">
+          <View style={styles.separator}></View>
+          <Text className="text-lg">
+            Urmeaza sa cumperi <Text className="font-psemibold">{selectedNumber}</Text> sticle sponsorizate de catre{" "}
+            <Text className="font-psemibold">{providerName}</Text>.
+          </Text>
+          <Text className="text-lg font-psemibold">
+            TOTAL: {selectedNumber * 0.5} RON
+          </Text>
+        </View>
+      ) : (
+        <>
+          {machine?.stock > 0 && providers.length > 0 && (
+            <ProviderSelector
+              title="Selecteaza Sponsorul"
+              value={selectedProvider}
+              handleChangeValue={setSelectedProvider}
+              providers={providers}
+              otherStyles="mb-2"
+            />
+          )}
+          {machine?.stock > 0 && (
+            <NumberSelector
+              title="Cate sticle vrei sa achizitionezi ?"
+              value={selectedNumber}
+              handleChangeValue={setSelectedNumber}
+              stock={
+                providerStock && providerStock < machine?.stock
+                  ? providerStock
+                  : machine?.stock
+              }
+              otherStyles="mb-2"
+            />
+          )}
+        </>
       )}
-      {machine?.stock > 0 && (
-        <NumberSelector
-          title="Cate sticle vrei sa achizitionezi ?"
-          value={selectedNumber}
-          handleChangeValue={setSelectedNumber}
-          stock={
-            providerStock && providerStock < machine?.stock
-              ? providerStock
-              : machine?.stock
-          }
-          otherStyles="mb-2"
-        />
-      )}
+
       {showPayment ? (
         <Payment newOrder={newOrder} onPaymentSuccess={handlePaymentSuccess} />
       ) : (
@@ -160,6 +183,10 @@ const styles = StyleSheet.create({
   stock: {
     fontFamily: "Poppins-SemiBold",
     fontSize: 18,
+  },
+  info: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 16,
   },
   separator: {
     height: 1,

@@ -12,6 +12,7 @@ import CustomMarker from "../../components/CustomMarker";
 import { getCurrentUser, getVendingMachines } from "../../lib/appwrite";
 import VendingMachineDetails from "../../components/VendingMachineDetails";
 import MapViewDirections from "react-native-maps-directions";
+import { GOOGLE_MAPS_APIKEY } from "@env";
 
 const Explore = () => {
   const { user } = useGlobalContext();
@@ -34,7 +35,7 @@ const Explore = () => {
   const [destination, setDestination] = useState(null);
 
   const router = useRouter();
-  const GOOGLE_MAPS_APIKEY = 'AIzaSyBr5biKuVQxxFXscwgKks3wzSGjXO8wy5A';
+  const apiKey = process.env.GOOGLE_MAPS_APIKEY;
 
   const getDistance = (lat1, lon1, lat2, lon2) => {
     const toRadians = (deg) => deg * (Math.PI / 180);
@@ -197,7 +198,7 @@ const Explore = () => {
                     longitude: userLocation.longitude,
                   }}
                   destination={destination}
-                  apikey={GOOGLE_MAPS_APIKEY}
+                  apikey={apiKey}
                   strokeWidth={6}
                   strokeColor="blue"
                   onReady={result => {
