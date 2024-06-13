@@ -1,12 +1,14 @@
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
-import { router, useRouter } from "expo-router";
+import { Redirect, router, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/CustomButton";
 import HtoGo from "../components/HtoGo";
 import { signOut } from "../lib/appwrite";
+import { useGlobalContext } from "../context/GlobalProvider";
 
 const App = () => {
+  const { user } = useGlobalContext();
   const router = useRouter();
   const clearSession = async () => {
     await signOut();
@@ -15,6 +17,8 @@ const App = () => {
   const navigateTo = () => {
     router.replace('/update-provider')
   }
+
+  if (user != null) return <Redirect href="/explore" />;
 
   return (
     <SafeAreaView className="bg-slate-200">

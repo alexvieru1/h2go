@@ -5,7 +5,7 @@ const OrderLayout = () => {
   return (
     <>
       <Stack>
-        <Stack.Screen name="success" options={{headerShown:false}}/>
+        <Stack.Screen name="success/[selectedProvider]" options={{headerShown:false}}/>
       </Stack>
     </>
   );

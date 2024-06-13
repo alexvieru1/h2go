@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Animated } from "react-native";
+import { View, Animated, Text, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BurgerButton from "../../components/BurgerButton";
 import { Redirect, useRouter } from "expo-router";
@@ -11,6 +11,7 @@ import SideBar from "../../components/SideBar";
 import CustomMarker from "../../components/CustomMarker";
 import { getCurrentUser, getVendingMachines } from "../../lib/appwrite";
 import VendingMachineDetails from "../../components/VendingMachineDetails";
+import MapViewDirections from "react-native-maps-directions";
 
 const Explore = () => {
   const { user } = useGlobalContext();
@@ -27,8 +28,27 @@ const Explore = () => {
 
   const [selectedMachine, setSelectedMachine] = useState(null);
   const [isPressed, setIsPressed] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [distance, setDistance] = useState(null);
+  const [time, setTime] = useState(null);
+  const [destination, setDestination] = useState(null);
 
   const router = useRouter();
+  const GOOGLE_MAPS_APIKEY = 'AIzaSyBr5biKuVQxxFXscwgKks3wzSGjXO8wy5A';
+
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+    const toRadians = (deg) => deg * (Math.PI / 180);
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in kilometers
+    return distance;
+  };
 
   useEffect(() => {
     const fetchLocationAndVendingMachines = async () => {
@@ -37,15 +57,13 @@ const Explore = () => {
         if (!currentUser) {
           throw new Error("User not authenticated");
         }
-        
-        // Request location permission
+
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
           console.log("Permission to access location was denied");
           return;
         }
 
-        // Fetch current location
         let location = await Location.getCurrentPositionAsync({});
         const region = {
           latitude: location.coords.latitude,
@@ -54,8 +72,8 @@ const Explore = () => {
           longitudeDelta: 0.0421,
         };
         setInitialRegion(region);
+        setUserLocation(location.coords);
 
-        // Fetch vending machines
         const machines = await getVendingMachines();
         if (Array.isArray(machines)) {
           setVendingMachines(machines);
@@ -63,8 +81,6 @@ const Explore = () => {
           console.error("Expected an array of vending machines but got:", machines);
           setVendingMachines([]);
         }
-
-        // console.log(machines);
 
         const validCoordinates = machines
           .filter((machine) => machine.latitude && machine.longitude)
@@ -118,14 +134,29 @@ const Explore = () => {
   };
 
   const markerPress = (machine) => {
+    if (userLocation) {
+      const distance = getDistance(
+        userLocation.latitude,
+        userLocation.longitude,
+        parseFloat(machine.latitude),
+        parseFloat(machine.longitude)
+      );
+      console.log(`Distance: ${distance.toFixed(2)} km`); // Log distance to the console
+      setDistance(distance.toFixed(2)); // Round to 2 decimal places
+    }
     setSelectedMachine(machine);
+    setDestination({
+      latitude: parseFloat(machine.latitude),
+      longitude: parseFloat(machine.longitude),
+    });
     setIsPressed(true);
   };
 
   const clearSelectionPress = () => {
     setSelectedMachine(null);
     setIsPressed(false);
-  }
+    setDestination(null);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#E5E7EB" }}>
@@ -158,9 +189,26 @@ const Explore = () => {
                     isPressed={isPressed && selectedMachine?.vendingMachineId === machine.vendingMachineId}
                   />
                 ))}
+
+              {destination && userLocation && (
+                <MapViewDirections
+                  origin={{
+                    latitude: userLocation.latitude,
+                    longitude: userLocation.longitude,
+                  }}
+                  destination={destination}
+                  apikey={GOOGLE_MAPS_APIKEY}
+                  strokeWidth={6}
+                  strokeColor="blue"
+                  onReady={result => {
+                    setDistance(result.distance.toFixed(2))
+                    setTime(Math.round(result.duration.toFixed(2)))
+                  }}
+                />
+              )}
             </MapView>
             {selectedMachine && (
-              <VendingMachineDetails machine={selectedMachine} />
+              <VendingMachineDetails machine={selectedMachine} duration={time} distance={distance} />
             )}
           </View>
         ) : (

@@ -1,19 +1,22 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import React, { useState, useEffect } from "react";
 import CustomButton from "./CustomButton";
 import NumberSelector from "./NumberSelector";
 import ProviderSelector from "./ProviderSelector";
+import Payment from "./Payment"; // Import the Payment component
 import { useGlobalContext } from "../context/GlobalProvider";
 import { createOrderAndAddToUserList, fetchProvider } from "../lib/appwrite";
 import { ID } from "react-native-appwrite";
 import { useRouter } from "expo-router";
 import { fetchProviders } from "../lib/appwrite"; // Adjust the import path accordingly
 
-const VendingMachineDetails = ({ machine }) => {
+const VendingMachineDetails = ({ machine, distance, duration }) => {
   const [selectedNumber, setSelectedNumber] = useState(1);
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [providers, setProviders] = useState([]);
   const [providerStock, setProviderStock] = useState(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [newOrder, setNewOrder] = useState(null); // Add state for newOrder
   const { user } = useGlobalContext();
   const router = useRouter();
 
@@ -49,7 +52,7 @@ const VendingMachineDetails = ({ machine }) => {
   }, [selectedProvider]);
 
   const handleCreateOrder = async () => {
-    const newOrder = {
+    const order = {
       orderId: ID.unique(),
       vendingMachineId: machine.vendingMachineId,
       userId: user.$id,
@@ -59,20 +62,25 @@ const VendingMachineDetails = ({ machine }) => {
       providerId: selectedProvider,
     };
 
+    setNewOrder(order);
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async () => {
     try {
-      const createdOrder = await createOrderAndAddToUserList(
+      await createOrderAndAddToUserList(
         newOrder,
         user.$id,
         machine.vendingMachineId,
         selectedNumber
       );
-      console.log("Order created and added to user list:", createdOrder);
-      router.replace("/success");
-      // Optionally, navigate to an order confirmation screen or display a success message
-      // router.push('/order-confirmation'); // Example navigation
+      console.log("Order created and added to user list:", newOrder);
+      console.log("Selected Provider:", selectedProvider);
+      router.replace(`/success/${selectedProvider}`);
+
     } catch (error) {
       console.error("Error creating order:", error);
-      // Optionally, display an error message to the user
+      Alert.alert("Error", "Unable to create order after successful payment.");
     }
   };
 
@@ -87,6 +95,8 @@ const VendingMachineDetails = ({ machine }) => {
           ? providerStock
           : machine?.stock}
       </Text>
+      <Text className="font-psemibold text-sm">Distanta: {distance} km</Text>
+      <Text className="font-psemibold text-sm">Timp: ~{duration} min.</Text>
       <View style={styles.separator}></View>
       <Text style={styles.address}>
         <Text style={styles.addressLabel}>Adresa:</Text> {machine?.address}
@@ -113,13 +123,17 @@ const VendingMachineDetails = ({ machine }) => {
           otherStyles="mb-2"
         />
       )}
-      <CustomButton
-        title={machine?.stock > 0 ? "Cumpara" : "Stoc indisponibil"}
-        containerStyles="mt-2 bg-green-400 border-4 border-green-800"
-        textStyles="text-green-800"
-        isLoading={machine?.stock <= 0}
-        handlePress={handleCreateOrder} // Add the onPress handler
-      />
+      {showPayment ? (
+        <Payment newOrder={newOrder} onPaymentSuccess={handlePaymentSuccess} />
+      ) : (
+        <CustomButton
+          title={machine?.stock > 0 ? "Cumpara" : "Stoc indisponibil"}
+          containerStyles="mt-2 bg-green-400 border-4 border-green-800"
+          textStyles="text-green-800"
+          isLoading={machine?.stock <= 0}
+          handlePress={handleCreateOrder} // Create order and show payment component
+        />
+      )}
     </View>
   );
 };
