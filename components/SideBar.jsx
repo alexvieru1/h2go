@@ -145,6 +145,22 @@ const SideBar = ({ user, isSidebarOpen, sidebarAnimation, closeSidebar }) => {
                 Update stoc tonomat
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/support-tickets");
+              }}
+              activeOpacity={0.7}
+              className="flex-row mt-6 items-center"
+            >
+              <MaterialIcons
+                name="admin-panel-settings"
+                size={24}
+                color="white"
+              />
+              <Text className="text-white text-lg font-pregular ml-2">
+                Tichete suport
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
       </Animated.View>

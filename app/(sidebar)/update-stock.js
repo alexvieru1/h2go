@@ -86,13 +86,13 @@ const UpdateVendingMachineStock = () => {
         <View className="min-h-[93vh] w-full flex flex-col justify-between px-4 mt-10">
           <View className="flex flex-col">
             <Text className="text-2xl font-pregular">
-              Update Vending Machine Stock
+              Update stoc tonomat
             </Text>
             <View className="mt-10">
               <HtoGo />
             </View>
             <Text className="text-lg font-pmedium text-center mt-10">
-              Select a vending machine to update stock.
+              Selectati un tonomat pentru a actualiza stocul
             </Text>
             {vendingMachines.length > 0 &&
               vendingMachines.map((machine) => (
@@ -104,21 +104,21 @@ const UpdateVendingMachineStock = () => {
                     Vending Machine: {machine.vendingMachineId}
                   </Text>
                   <Text className="text-lg">
-                    <Text className="font-psemibold">Current Stock:</Text>{" "}
+                    <Text className="font-psemibold">Stoc actual:</Text>{" "}
                     {machine.stock}
                   </Text>
                   <FormField
-                    title="New Stock"
+                    title="Stoc nou"
                     value={stockUpdates[machine.vendingMachineId] || ""}
                     handleChangeText={(e) =>
                       handleChangeStock(machine.vendingMachineId, e)
                     }
-                    placeholder="Enter new stock value"
+                    placeholder="Scrieti valoarea totala a stocului nou"
                     otherStyles="mt-7"
                     keyboardType="phone-pad"
                   />
                   <CustomButton
-                    title="Update Stock"
+                    title="Update Stoc"
                     handlePress={() =>
                       handleStockUpdate(machine.vendingMachineId)
                     }

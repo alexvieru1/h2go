@@ -48,12 +48,12 @@ const DeleteProvider = () => {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View className="min-h-[93vh] w-full flex flex-col justify-between px-4 mt-10">
           <View className="flex flex-col">
-            <Text className="text-2xl font-pregular">Manage Providers</Text>
+            <Text className="text-2xl font-pregular">Sterge sponsor</Text>
             <View className="mt-10">
               <HtoGo />
             </View>
             <Text className="text-lg font-pmedium text-center mt-10">
-              Select a provider to delete.
+              Selectati un sponsor pentru a fi sters.
             </Text>
             {providers.length > 0 &&
               providers.map((provider) => (
@@ -69,7 +69,7 @@ const DeleteProvider = () => {
                     {provider.providedStock}
                   </Text>
                   <CustomButton
-                    title="Delete Provider"
+                    title="Sterge sponsor"
                     handlePress={() => handleDeleteProvider(provider.$id)}
                     containerStyles="mt-7 bg-red-400"
                     textStyles="text-slate-200"

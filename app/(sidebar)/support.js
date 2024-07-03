@@ -1,27 +1,56 @@
-import React, { useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
 import { Redirect, useRouter } from "expo-router";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import HtoGo from "../../components/HtoGo";
-import FormField from "../../components/FormField";
+import {
+  deleteSupportTicket,
+  getSupportTicketsByUser,
+  getUserDetails,
+  updateSupportTicketStatus,
+} from "../../lib/appwrite";
+import Loading from "../../components/Loading";
 
 const Purchases = () => {
   const { user } = useGlobalContext();
-  const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userDetails, setUserDetails] = useState(null);
 
   if (user == null) return <Redirect href="/" />;
 
-  const [form, setForm] = useState({
-    subject:"",
-    email:"",
-    message: "",
-  });
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const userTickets = await getSupportTicketsByUser(user.$id);
+        const details = await getUserDetails(user.$id);
+        setUserDetails(details);
+        setTickets(userTickets);
+      } catch (error) {
+        console.error("Error fetching support tickets for user:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSendEmail = async () => {
+    fetchTickets();
+  }, [user]);
 
+  if (loading) {
+    return <Loading />;
+  }
+
+  const removeTicket = async (ticketId) => {
+    try {
+      await deleteSupportTicket(ticketId);
+      setTickets(tickets.filter(ticket => ticket.$id !== ticketId));
+      alert("Tichet sters cu succes!");
+    } catch (error) {
+      console.error("Error deleting support ticket:", error);
+      alert("Failed to delete support ticket. Please try again.");
+    }
   };
 
   return (
@@ -34,41 +63,33 @@ const Purchases = () => {
               <HtoGo />
             </View>
             <Text className="text-lg font-pmedium text-center mt-10">
-              Ati avut vreo problema legata de o comanda recenta sau un
-              distribuitor automat de apa ?
+              Tichete deschise
             </Text>
-            <Text className="text-sm font-pregular text-center mt-4">
-              Scrie-ne mai jos si vom reveni catre tine in cel mai scurt timp
-              posibil
-            </Text>
-            <FormField
-              title="Subiect"
-              value={form.subject}
-              handleChangeText={(e) => setForm({ ...form, subject: e })}
-              placeholder="Subiectul mesajului dumneavoastra"
-              otherStyles="mt-7"
-            />
-            <FormField
-              title="Email-ul pe care va v-om contacta"
-              value={user.email}
-              handleChangeText={(e) => setForm({ ...form, email: e })}
-              otherStyles="mt-7"
-              disabled
-            />
-            <FormField
-              title="Mesaj"
-              value={form.message}
-              handleChangeText={(e) => setForm({ ...form, message: e })}
-              placeholder="Ce s-a intamplat ?"
-              otherStyles="mt-7"
-            />
-            <CustomButton
-              title="Trimite"
-              handlePress={handleSendEmail}
-              containerStyles="mt-7 bg-blue-400"
-              textStyles="text-white"
-              isLoading={isSubmitting}
-            />
+            {tickets.length > 0 ? (
+              tickets.map((ticket, index) => (
+                <View
+                  key={index}
+                  className="mb-4 p-4 border border-gray-300 rounded-lg bg-white"
+                >
+                  <Text className="text-xl font-pbold">
+                    Order ID: {ticket.orderId}
+                  </Text>
+                  <Text className="text-xl font-pbold">
+                    Status: {ticket.isResolved ? "Rezolvat" : "Deschis"}
+                  </Text>
+                  <CustomButton
+                        title="Sterge tichet"
+                        handlePress={() => removeTicket(ticket.$id)}
+                        containerStyles="mt-4 border-2 border-red-700"
+                        textStyles="text-red-700"
+                      />
+                </View>
+              ))
+            ) : (
+              <Text className="text-lg font-pmedium italic text-center mt-10">
+                Nu aveti nici un tichet deschis.
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>

@@ -13,6 +13,7 @@ const SidebarLayout = () => {
         <Stack.Screen name="update-provider" options={{ headerShown: false }} />
         <Stack.Screen name="delete-provider" options={{ headerShown: false }} />
         <Stack.Screen name="update-stock" options={{ headerShown: false }} />
+        <Stack.Screen name="support-tickets" options={{ headerShown: false }} />
       </Stack>
     </>
   );
