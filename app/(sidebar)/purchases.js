@@ -100,7 +100,7 @@ const Purchases = () => {
                   </Text>
                   <Text className="text-lg">
                     <Text className="font-psemibold">Data:</Text>{" "}
-                    {new Date(order.datetime).toLocaleString()}
+                    {new Date(order.datetime).toLocaleString('en-GB')}
                   </Text>
                   <Text className="text-lg">
                     <Text className="font-psemibold">Cantitate:</Text>{" "}

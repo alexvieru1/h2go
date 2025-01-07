@@ -1,5 +1,6 @@
 {
   "expo": {
+    // "newArchEnabled": true,
     "name": "H2GO",
     "slug": "h2go",
     "scheme": "h2go",

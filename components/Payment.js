@@ -14,7 +14,7 @@ const Payment = ({ newOrder, onPaymentSuccess }) => {
     const fetchPaymentIntentClientSecret = async () => {
       try {
         const response = await fetch(
-          "http://192.168.1.128:3000/create-payment-intent",
+          "http://192.168.0.180:3000/create-payment-intent",
           {
             method: "POST",
             headers: {

@@ -63,7 +63,7 @@ const Purchases = () => {
               <HtoGo />
             </View>
             <Text className="text-lg font-pmedium text-center mt-10">
-              Tichete deschise
+              Tichetele mele
             </Text>
             {tickets.length > 0 ? (
               tickets.map((ticket, index) => (
